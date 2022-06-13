@@ -67,7 +67,7 @@ Type: python DSTT_test.py 4 :
 	Available numeric options are: 1,2,3,4,5, or 6
 
 Running a Training Task:
-	DSTT_test.py is used to run the training. 
+	DSTT_train.py is used to run the training. 
 	Examples to run a training:
 	python DSTT_train.py	
 	without any options to run a training job with default parameters to train all the short-term ,1-6 hours, and save them to the "models" directory.
