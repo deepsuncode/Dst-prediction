@@ -56,7 +56,7 @@ class DSTTModel:
     X_test=None
     y_test=None
     predictions = None
-    epistimics = None 
+    epistemics = None 
     aleatoric = None
     dates = None 
     
@@ -84,7 +84,7 @@ class DSTTModel:
         self.aleatoric = al 
     
     def set_epis(self,ep):
-        self.epistimics = ep
+        self.epistemics = ep
     
     def set_preds (self,p):
         self.predictions = p 
@@ -203,7 +203,7 @@ class DSTTModel:
         aleatoric=(np.sqrt(multiplication_term_mean)) 
         epistemic=np.mean(preds ** 2, axis=0) - np.mean(preds, axis=0) ** 2
         epistemic = np.sqrt(epistemic) *0.7
-        self.epistimics = np.std(np.squeeze(epistemic))
+        self.epistemics = np.std(np.squeeze(epistemic))
         self.aleatoric = np.std(np.squeeze(aleatoric))
         return np.squeeze(prediction), np.std(np.squeeze(aleatoric)), np.std(np.squeeze(epistemic)), p_hat
 
@@ -313,14 +313,14 @@ class DSTTModel:
         return True  
     
     def get_file_name(self,num_hours,n, results_dir='results'):
-        return results_dir + os.sep + 'dst_' + str(num_hours)+'h_' + str(n)+'.txt'
+        return results_dir + os.sep + 'dst_' + str(num_hours)+'h_' + str(n)+'.csv'
         
     def save_results(self,num_hours,results_dir='results'):
         data = {
                 'Date': self.dates,
                 'Labels':list(self.y_test.flatten()),
                 'Predictions':self.predictions,
-                'Epistemic':self.epistimics,
+                'Epistemic':self.epistemics,
                 'Aleatoric':self.aleatoric
                 }
         df = pd.DataFrame(columns=data.keys())
@@ -328,19 +328,19 @@ class DSTTModel:
         df['Labels'] = list(self.y_test.flatten())
         df['Predictions'] = list(self.predictions)
         e = [math.nan for i in range(len(self.predictions))]
-        e[0] = self.epistimics
+        e[0] = self.epistemics
         a = [math.nan for i in range(len(self.predictions))]
         a[0] = self.aleatoric
-        df['Epistimic'] = e
+        df['Epistemic'] = e
         df['Aleatoric'] = a
-        log('Saving the result to:', results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.txt',verbose=True)
-        df.to_csv(results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.txt',index=None)
+        log('Saving the result to:', results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.csv',verbose=True)
+        df.to_csv(results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.csv',index=None)
 
     def get_results(self,num_hours,results_dir='results'):
-        if not os.path.exists(results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.txt'):
+        if not os.path.exists(results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.csv'):
             print('Error: the results file does not exist for h = ' + str(num_hours), 'File must be:', results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.txt')
             exit()
             
-        data = pd.read_csv(results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.txt')
-        return data['Predictions'].values, (data['Aleatoric'].values)[0],(data['Epistimic'].values)[0], data['Labels'].values, data['Date'].values    
+        data = pd.read_csv(results_dir + os.sep + 'dst_' + str(num_hours)+'h_results.csv')
+        return data['Predictions'].values, (data['Aleatoric'].values)[0],(data['Epistemic'].values)[0], data['Labels'].values, data['Date'].values    
         

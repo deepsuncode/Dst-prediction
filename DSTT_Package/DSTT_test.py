@@ -56,6 +56,17 @@ interval_type = 'hourly'
 show_figures=True
 #The number of Monte Carlo Sampling 
 MCS=100
+
+
+models_directory="models"
+results_dir='results'
+figures_dir='figures'
+
+    
+os.makedirs(models_directory,  exist_ok=True)
+os.makedirs(results_dir,  exist_ok=True)
+os.makedirs(figures_dir,  exist_ok=True)
+
 def test(start_hour, end_hour,show_figures=False):
     for k in range(start_hour,end_hour):
         model = DSTTModel()
@@ -88,11 +99,12 @@ def test(start_hour, end_hour,show_figures=False):
         log('Loading the model and its weights.')
         model.load_model(input_shape, 
                          kl_weight=1/X_train.shape[0],
-                         num_hours=6)
+                         num_hours=6,
+                         w_dir=models_directory)
         predictions =  model.predict(X_test)
-        file_name = 'figures' +'' + os.sep + 'dst_' +str(num_hours) + interval_type[0] +'.png'
-        file_name_aleatoric = 'figures' +'' + os.sep + 'dst_' +str(num_hours) + interval_type[0] +'_aleatoric.png'
-        file_name_epistemic = 'figures' +'' + os.sep + 'dst_' +str(num_hours) + interval_type[0] +'_epistemic.png'
+        file_name = figures_dir +'' + os.sep + 'dst_' +str(num_hours) + interval_type[0] +'.png'
+        file_name_aleatoric = figures_dir +'' + os.sep + 'dst_' +str(num_hours) + interval_type[0] +'_aleatoric.png'
+        file_name_epistemic = figures_dir +'' + os.sep + 'dst_' +str(num_hours) + interval_type[0] +'_epistemic.png'
         
         figsize = (9,3.5)
         
@@ -110,7 +122,7 @@ def test(start_hour, end_hour,show_figures=False):
         model.set_epis(predictions_ft[2])
         model.set_al(predictions_ft[1])
         model.set_dates(ax_dates)
-        model.save_results(num_hours)
+        model.save_results(num_hours,results_dir=results_dir)
         
         plot_figure(ax_dates,y_test,predictions,predictions_ft[2],num_hours,label='Dst index',
                     file_name=file_name_epistemic ,wider_size=False,figsize = figsize,
